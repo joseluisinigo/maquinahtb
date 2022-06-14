@@ -1,10 +1,10 @@
-# Author: José Luis Íñigo
-# Nickname: Riskoo
-# Bibliographical sources: S4vitar https://www.youtube.com/watch?v=YmZLdJRBKv0&
-# Machine Admirertoo Hack the box
-# OSCP Style : PHP SSRF RCE CVE PASSWORD 
-# REUSE eWPT eWPTXv2 OSWE
-# Skills: Subdomain Enumeration Adminer Enumeration SSRF (Server Side Request Forgery) in Adminer [CVE-2021-21311] Abusing redirect to discover internal services OpenTSDB Exploitation [CVE-2020-35476] [Remote Code Execution] Searching for valid metrics OpenCats PHP Object Injection to Arbitrary File Write Abusing Fail2ban [Remote Code Execution] (CVE-2021-32749) Playing with phpggc in order to serialize our data Abusing whois config file + OpenCats + Fail2ban [Privilege Escalation]
+#Author: José Luis Íñigo
+#Nickname: Riskoo
+#Bibliographical sources: S4vitar https://www.youtube.com/watch?v=YmZLdJRBKv0&
+#Machine Admirertoo Hack the box
+#OSCP Style : PHP SSRF RCE CVE PASSWORD 
+#REUSE eWPT eWPTXv2 OSWE
+#Skills: Subdomain Enumeration Adminer Enumeration SSRF (Server Side Request Forgery) in Adminer [CVE-2021-21311] Abusing redirect to discover internal services OpenTSDB Exploitation [CVE-2020-35476] [Remote Code Execution] Searching for valid metrics OpenCats PHP Object Injection to Arbitrary File Write Abusing Fail2ban [Remote Code Execution] (CVE-2021-32749) Playing with phpggc in order to serialize our data Abusing whois config file + OpenCats + Fail2ban [Privilege Escalation]
 
 ## Comnenzamos con el mapeado
 Encontramos poco solo que el puerto 22 y 80 están abiertos
