@@ -1,9 +1,12 @@
-# Author: José Luis Íñigo
-# Nickname: Riskoo
-# Bibliographical sources: S4vitar
-# Machine bakendtwo Hack the box
-# REUSE EWPT eWPTXv2 OSWE
-# Skills: API Enumeration Abusing API - Registering a user Accessing the Docs path of FastAPI Mass Assignment Attack (Becoming superusers) Abusing API - Reading system files Information Leakage Forge JWT (Assigning us an extra privilege) Abusing API - Creating a new file to achieve remote command execution (RCE) Abusing pam_wordle (Privilege Escalation)
+
+![](2022-06-23-08-17-49.png)
+
+- Author: José Luis Íñigo
+- Nickname: Riskoo
+- Bibliographical sources: S4vitar
+- Machine bakendtwo Hack the box
+- REUSE EWPT eWPTXv2 OSWE
+- Skills: API Enumeration Abusing API - Registering a user Accessing the Docs path of FastAPI Mass Assignment Attack (Becoming superusers) Abusing API - Reading system files Information Leakage Forge JWT (Assigning us an extra privilege) Abusing API - Creating a new file to achieve remote command execution (RCE) Abusing pam_wordle (Privilege Escalation)
 
 ## 1 hacemos el mapeo tipo s4vitar
 ip 10.10.11.162

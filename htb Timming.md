@@ -1,5 +1,16 @@
 # htb timming
 
+![](2022-06-23-08-14-18.png)
+
+![](2022-06-23-08-14-32.png)
+
+- Author: José Luis Íñigo
+- Nickname: Riskoo
+- Bibliographical sources: S4vitar
+- Machine timing Hack the box
+- Skills: Local File Inclusion (LFI) Using Wrappers - Base64 Wrapper Code Inspection Role manipulation File Upload Exploitation Abusing Sudoers Privilege - Playing with symbolic links
+- eWPT eWPTXv2 OSWE
+
 1º Vamos a ver los puertos abiertos
 ```bash
 sudo nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn 10.10.11.135 -oG allports

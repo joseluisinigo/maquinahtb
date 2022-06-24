@@ -1,0 +1,35 @@
+# Nmap 7.92 scan initiated Thu Jun 23 09:17:49 2022 as: nmap -sCV -p4,22,80,88,9999,56423 -oN Targeted 10.10.10.62
+Nmap scan report for 10.10.10.62
+Host is up (0.052s latency).
+
+PORT      STATE SERVICE VERSION
+4/tcp     open  http    nginx 1.18.0 (Ubuntu)
+|_http-title: Site doesn't have a title (text/html; charset=UTF-8).
+|_http-server-header: nginx/1.18.0 (Ubuntu)
+22/tcp    open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.2 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 48:ad:d5:b8:3a:9f:bc:be:f7:e8:20:1e:f6:bf:de:ae (RSA)
+|   256 b7:89:6c:0b:20:ed:49:b2:c1:86:7c:29:92:74:1c:1f (ECDSA)
+|_  256 18:cd:9d:08:a6:21:a8:b8:b6:f7:9f:8d:40:51:54:fb (ED25519)
+80/tcp    open  http    nginx 1.18.0 (Ubuntu)
+|_http-title: Input string was not in a correct format.
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: nginx/1.18.0 (Ubuntu)
+88/tcp    open  http    nginx 1.18.0 (Ubuntu)
+|_http-title: phpMyAdmin
+| http-robots.txt: 1 disallowed entry 
+|_/
+|_http-server-header: nginx/1.18.0 (Ubuntu)
+9999/tcp  open  http    nginx 1.18.0 (Ubuntu)
+|_http-title: Input string was not in a correct format.
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: nginx/1.18.0 (Ubuntu)
+56423/tcp open  http    nginx 1.18.0 (Ubuntu)
+|_http-title: Site doesn't have a title (application/json;charset=utf-8).
+|_http-server-header: Fulcrum-API Beta
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Thu Jun 23 09:18:18 2022 -- 1 IP address (1 host up) scanned in 29.01 seconds
