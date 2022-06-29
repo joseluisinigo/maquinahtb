@@ -319,8 +319,8 @@ Si ponemos tty miramos si estamos dentro. Si no hacemos estas cosas cuando hagam
 script /dev/null -c bash
 
 #Con control+z dejamos de escuchar el puerto
-
 stty raw -echo;fg     
+
 # Con esto hemos conseguido reiniciar la configuración de la terminal en bash
 reset xterm
 

@@ -1,0 +1,8 @@
+# Nmap 7.92 scan initiated Tue Jun 28 19:45:42 2022 as: nmap --script http-enum -p3000 -oN webScan 10.10.11.120
+Nmap scan report for 10.10.11.120
+Host is up (0.047s latency).
+
+PORT     STATE SERVICE
+3000/tcp open  ppp
+
+# Nmap done at Tue Jun 28 19:45:43 2022 -- 1 IP address (1 host up) scanned in 0.46 seconds
