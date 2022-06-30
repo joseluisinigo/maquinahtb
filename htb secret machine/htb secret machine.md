@@ -545,15 +545,6 @@ Estupendo , haciendole un head he visto utf8 por lo que puede que haya algo dent
         -----END OPENSSH PRIVATE KEY-----
 ```
 
-Abajo veo otra pero creo que es la misma
-
-```bash
-3,1,0,1,38,0,1633544227,"-----BEGIN OPENSSH PRIVATE KEY-----","b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABlwAAAAdzc2gtcn","NhAAAAAwEAAQAAAYEAn6zLlm7QOGGZytUCO3SNpR5vdDfxNzlfkUw4nMw/hFlpRPaKRbi3","KUZsBKygoOvzmhzWYcs413UDJqUMWs+o9Oweq0viwQ1QJmVwzvqFjFNSxzXEVojmoCePw+","7wNrxitkPrmuViWPGQCotBDCZmn4WNbNT0kcsfA+b4xB+am6tyDthqjfPJngROf0Z26lA1","xw0OmoCdyhvQ3azlbkZZ7EWeTtQ/EYcdYof
-...
-...
-
-```
-
 La idea ahora es conectarnos por ssh. ¿Cómo lo hacemos teniendo la clave privada? Guardamos la clave en un archivo , por ejemplo id_rsa.pub en el directorio del usuario y luego:
 
 ```bash
@@ -562,6 +553,10 @@ ssh -i /home/dasith/id_rsa.pub root@10.10.11.120
 
 Lamentablemente aunque parece que si funciona, parece que hay alguien conectado o por lo menos el proceso está abierto y nos aparece
 ```bash
+
+#Este error que aparece ahora se soluciona dándole permiso 600  la clave rsa
+#chmod 600 id_rsa.pub
+#por otra parte no se conectaría porque está en uso
 dasith@secret:~$ ssh -i /home/dasith/id_rsa.pub root@10.10.11.120
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @         WARNING: UNPROTECTED PRIVATE KEY FILE!          @
@@ -571,7 +566,7 @@ It is required that your private key files are NOT accessible by others.
 This private key will be ignored.
 Load key "/home/dasith/id_rsa.pub": bad permissions
 ```
-Hay que buscar una forma de cerrar el proceso. Mirando el code.c aparece un comentario  // Enable coredump generation. Esa es una buena pista para intentar generar un bloqueo del proceso. Cuando un programa se bloquea, el sistema almacena los archivos de volcado de bloqueo en /var/crash
+Hay que buscar una forma de cerrar el proceso. Mirando el code.c aparece un comentario  **// Enable coredump generation**. Esa es una buena pista para intentar generar un bloqueo del proceso. Cuando un programa se bloquea, el sistema almacena los archivos de volcado de bloqueo en **/var/crash**
 
 ![](2022-06-29-11-35-19.png)
 
