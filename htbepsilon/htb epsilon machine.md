@@ -1,8 +1,12 @@
 
 
 ![](2022-06-30-08-52-35.png)
-- Skills: Git Source Leak Exploit (GitHack) AWS Enumeration Lambda Function Enumeration Authentication Bypass Abusing JWT Server Side Template Injection (SSTI) Tar Symlink Exploitation
-- Style: eWPT eWPTXv2 OSCP OSWE
+
+- #Author: José Luis Íñigo
+- #Nickname: Riskoo
+- #Machine Epsilon Hack the box
+- #Skills: Git Source Leak Exploit (GitHack) AWS Enumeration Lambda Function Enumeration Authentication Bypass Abusing JWT Server Side Template Injection (SSTI) Tar Symlink Exploitation
+- #Style: eWPT eWPTXv2 OSCP OSWE
 
 # Fase de reconocomiento
 

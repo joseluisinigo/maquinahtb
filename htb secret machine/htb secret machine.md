@@ -10,13 +10,13 @@
 - Code Analysis Abusing an API Json Web Tokens (JWT) Abusing/Leveraging Core Dump [Privilege Escalation]
 - style eWPT eWPTXv2 OSWE
 
-Comprobamos que estamos conectados
+### Comprobamos que estamos conectados a la máquina de hack the box
 
 ![](2022-06-28-19-26-29.png)
 
-Se trata de una máquina linux
+Se trata de una máquina linux . Las máquinas linux sulen estar en 64 y las windows en 128
 
-Vemos los puertos
+### Exploramos los puertos abiertos en la máquina desde el exterior
 
 ```
 sudo nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn 10.10.11.120 -oG allports
@@ -24,10 +24,9 @@ sudo nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn 10.10.11.120 -oG allports
 
 Los puertos abiertos son 22,80,3000
 
-Inspeccionamos los puertos
+### Inspeccionamos los puertos para ver que servicios corren en ellos y si son vulnerables a alguno de los script de nmap
 
 ```bash
-nmap -sCV -p22,80,3000 10.10.11.120 -oN Targeted
 nmap -sCV -p22,80,3000 10.10.11.120 -oN Targeted
 Starting Nmap 7.92 ( https://nmap.org ) at 2022-06-28 19:32 CEST
 Nmap scan report for 10.10.11.120
@@ -50,19 +49,19 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 14.20 seconds
 
 ```
-Pues bien tenemos un ssh, web y un servidor node.js
+Los puertos son ssh, web y un servidor node.js
 
-En el puerto 3000 tenemos un dumdocs que no se que es.
+En el puerto 3000 tenemos un dumdocs que es un tipo docusaurios para blog con markdown en node.js
 
-Hacemos un whatweb
+### Hacemos un whatweb para ver las tecnologías que usa la web
 
 ```bash
 whatweb 10.10.11.120:3000
 http://10.10.11.120:3000 [200 OK] Bootstrap, Country[RESERVED][ZZ], HTML5, IP[10.10.11.120], Lightbox, Meta-Author[Xiaoying Riley at 3rd Wave Media], Script, Title[DUMB Docs], X-Powered-By[Express], X-UA-Compatible[IE=edge]
 ```
-Antes de explorar voy a ver que tal la web, ssh de momento lo dejamos de momento porque normalmente se utiliza para lueog entrar y escalar privilegios.
+Recorremos la web, ssh lo dejamos de momento porque normalmente se utiliza para luego poder entrar y escalar privilegios.
 
-Vale el puerto 80 nos da la misma web... 
+El puerto 80 y 5000 nos da la misma web nos da la misma web ... 
 
 A simple vista vemos un register user pero vamos a ver que tal un fuzzin para ver las rutas, si vemos mucho pues nos centramos inicialmente en register y login.
 
@@ -79,7 +78,7 @@ Nmap done: 1 IP address (1 host up) scanned in 119.15 seconds
 
 ```
 
-Voy a usar ferox. Veo muchas urls por lo que voy a hacer inicialmente un reconocimiento en register y login
+Voy a usar ferox que es un fuzzing para ver diferentes carpetas. Veo muchas urls por lo que voy a hacer inicialmente un reconocimiento en register y login
 
 ```bash
  ___  ___  __   __     __      __         __   ___
@@ -124,16 +123,18 @@ Explorando la web veo que se puede descargar uno el código por lo que nos lo de
 
 ![](2022-06-28-21-56-08.png)
 
-Bueno entiendo que el motivo por el que se considera una web fácil en principio es que desde el login y register te viene casi un manual, voy a investigar esto antes que el código.
+>Entiendo que el motivo por el que se considera una web fácil en principio es que desde el login y register te viene casi un manual, voy a investigar esto antes que el código.
 
-El motivo de explorar estas opciones es por provar lo que ponen y además el código pesa bastante por lo cual creo que va a traer demasiada información a priori.
+El motivo de explorar estas opciones es por probar lo que ponen y además el código pesa bastante por lo cual creo que va a traer demasiada información a priori.
 
 Intento ver que pasa si directamente pongo
+```bash
 /api/user/login
 o 
 /api/user/register
+```
 
-Pero no encuentra. Realmente el registro me está diciendo que tiene que ser por post y hay que enviarle un json
+Realmente el registro me está diciendo que tiene que ser por post y hay que enviarle un json
 
 Capturamos con burpsuite /api/user/register
 
@@ -153,7 +154,7 @@ Nos pone un ejemplo que luego intentaremos loguearnos porque seguramente este fu
 
 ```
 
-vamos a añadirle un json con nuestras credenciales, pero primero vamos a ver si el root funciona y nos quitamos de problemas
+Le añadimos un json con nuestras credenciales, pero primero vamos a ver si el root funciona y nos quitamos de problemas
 
 ```bash
 curl -X POST -H "Content-Type: application/json" 
@@ -176,7 +177,7 @@ curl -X POST -H "Content-Type: application/json"
  
 ```
 
-Vale, en principio nos devuelve un jwt el cual no hemos visto que se pida en ninguna parte, vamos a intentar cambiar los valores
+Nos devuelve un jwt el cual no hemos visto que se pida en ninguna parte, vamos a intentar cambiar los valores
 
 ```bash
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MmJiNDg2NjcwYjNkZTA0NjBlMTI5ZDgiLCJuYW1lIjoicGVwaXRvIiwiZW1haWwiOiJwZXBpdG9AcGVwaXRvLmVzIiwiaWF0IjoxNjU2NDQyNjczfQ.Otks_fVahBvM6qlhwHMTpaAbpWSorNyS41hD7wIk1_c%  
@@ -212,7 +213,7 @@ Voy a intentar hacer un ataque de confusión. Para ello necesito otro token por 
 
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MmJiNjRhMzcwYjNkZTA0NjBlMTI5ZTAiLCJuYW1lIjoicGVwaXRvMiIsImVtYWlsIjoicGVwaXQyb0BwZXBpdG8uZXMiLCJpYXQiOjE2NTY0NDgyNTR9.bxUClMgtmQz7zZhgCyxf_Te69-XF5gFGxzAkYF3zdVw
 ```
-Ahora tenemos dos tokens y podemos usar el ataque de confusión
+Ahora tenemos dos tokens y es posible que podamos usar el ataque de confusión.
 
 ```bash
 # Posiblemente tenga que encender docker
