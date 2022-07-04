@@ -146,13 +146,13 @@ Supongamos que el token es: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiYWN
 
 Vamos a jwt.io
 
-![](2022-06-04-18-29-17.png)
+
 
 Si supiésemos el secreto base64 url (payload) podriamos convertirnos por ejemplo en superusuario poinendolo en true.
 
 Vamos a Burpsuite y utilizamos match and replace para cambiar la cabecera. En este caso le vamos a pasar Authorization: berare y el token que es lo que nos aparece y vamos a a ver que pasa.
 
-![](2022-06-06-12-08-59.png)
+
 
 🔥NEW🔥Importante🔥NEW🔥
 
@@ -168,13 +168,13 @@ Authorization: bearere máseltoken
 
 
 
-![](2022-06-06-12-56-37.png)
+
 
 Teniendo activado burpsuite para que haga el cambio de cabecera como hemos dicho antes, entramos en 10.10.11.167/docs , vemos que ha intercepato y que aparecen los datos bearer y token.Posteriormente dejamos de interceptar y debería de entrar.
 
 Analizamos las cosas y vemos que en la parte de profile tiene el error de [mass Asignment Attack](/docs/Programs%20atack/know%20how%20mass%20Asignment%20Attack#mass-asignnment-attack) por lo que esplotamos y ponemos en true el usuario
 
-![](2022-06-06-13-36-41.png)
+
 
 
 🔥NEW🔥Importante🔥NEW🔥🔥NEW🔥Importante🔥NEW🔥
@@ -182,14 +182,14 @@ Con esto yendo a la parte de obtenerflag ya lo tendriamos resuelto pero vamos a 
 
 Ahora una vez logueados vamos a intentar leer el /etc/passwd
 Tengo que ver cual es el encode
-![](2022-06-07-09-34-54.png)
+
 
 
 
 
 Vemos que lo lee
 
-![](2022-06-07-09-36-18.png)
+
 
 
 Ahora vamos a intentar escribir un archivo y vemos que nos da un error del token por lo que vamos a hacernos un script. Pese a que somos administrador el problema reside en el token por lo que vimos de la palabra secreta.

