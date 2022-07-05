@@ -1,8 +1,8 @@
 # htb timming
 
-![](2022-06-23-08-14-18.png)
 
-![](2022-06-23-08-14-32.png)
+
+
 
 - Author: José Luis Íñigo
 - Nickname: Riskoo

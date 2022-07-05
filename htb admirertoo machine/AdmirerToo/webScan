@@ -1,0 +1,8 @@
+# Nmap 7.92 scan initiated Wed Jun  8 10:22:27 2022 as: nmap -Pn -f --script http-enum -p80 -oN webScan 10.10.10.137
+Nmap scan report for 10.10.10.137
+Host is up.
+
+PORT   STATE    SERVICE
+80/tcp filtered http
+
+# Nmap done at Wed Jun  8 10:22:30 2022 -- 1 IP address (1 host up) scanned in 2.53 seconds

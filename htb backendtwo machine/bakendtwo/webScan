@@ -1,0 +1,2 @@
+# Nmap 7.92 scan initiated Sat Jun  4 17:00:25 2022 as: nmap --script http-enum -p80 -oN webScan 10.10.10.162
+# Nmap done at Sat Jun  4 17:00:29 2022 -- 1 IP address (0 hosts up) scanned in 3.35 seconds
