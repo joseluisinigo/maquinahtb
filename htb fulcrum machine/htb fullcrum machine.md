@@ -1,6 +1,6 @@
-![](2022-06-23-08-20-07.png)
+![](assets/2022-06-23-08-20-07.png)
 
-![](2022-06-23-08-20-43.png)
+![](assets/2022-06-23-08-20-43.png)
 
 - #Author: José Luis Íñigo
 - #Nickname: Riskoo
@@ -155,7 +155,7 @@ Vemos que tenemos un index. un home y un upload que a lo mejor nos deja subir al
 
 El php que más me ha llamado la atención por nombre es el upload.php , me sale un mensaje como que no ha sido posible subir archivo. He intentado ver por burpsuite pero aun poniendo algunos parámetros random nada interesante que encontrar en poco tiempo. Ha sido un fallo porque despúes he mirado home.php y tiene la opción de subir archivo jaja, así que nada voy a analizar
 
-![](2022-06-23-10-03-22.png)
+![](assets/2022-06-23-10-03-22.png)
 
 Después de analizar la subida, diferentes wraper, transversal nada de momento.
 

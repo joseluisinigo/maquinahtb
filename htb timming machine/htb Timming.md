@@ -18,7 +18,7 @@ sudo nmap -p- --open -sS --min-rate 5000 -vvv -n -Pn 10.10.11.135 -oG allports
 
 Puertos abiertos el 22 y 80 que son el web y ssh
 
-![](2022-06-22-09-10-19.png)
+![](assets/2022-06-22-09-10-19.png)
 
 2º Sabemos que nos encontramos ante un linux ya que nos ha dado de ping 64, recordamos que linux suele estar en los 64 y windows en los 128
 
@@ -28,7 +28,7 @@ Puertos abiertos el 22 y 80 que son el web y ssh
 nmap -sCV -p22,80 10.10.11.135 -oN Targeted
 ```
 
-![](2022-06-22-09-14-58.png)
+![](assets/2022-06-22-09-14-58.png)
 
 Podemos sacar de información que estamos en un openssh 7.6p1 ubuntu el loguin php
 
@@ -73,7 +73,7 @@ wfuzz -c --hc=404 -L -t 200 -w ../diccionarios/SecLists/Discovery/Web-Content/di
 ```
 En este caso hemos encontrado header, upload, footer, profile, logout, login e index
 
-![](2022-06-22-09-37-07.png)
+![](assets/2022-06-22-09-37-07.png)
 
 Invetigamos estas páginas, todas las páginas nos llevan a login.php, hemos podido observar una evidencia nueva y es la web que se llamaría karosearch.com , lo podemos poner en evidencias y a lo mejor usarlo como hostname
 
@@ -83,7 +83,7 @@ Para ver subdominios previamente tenemos que añadir el vhost
 
 En /etc/hosts
 
-![](2022-06-22-09-48-11.png)
+![](assets/2022-06-22-09-48-11.png)
 
 Una vez que tenemos puesto el dominio ya podemos hacer un gobuster
 
@@ -100,13 +100,13 @@ Vamos a usar feroxbuster para probar y ver si encontramos algo más. Hemos encon
 feroxbuster -u http://10.10.11.135 -x php
 ```
 
-![](2022-06-22-10-20-39.png)
+![](assets/2022-06-22-10-20-39.png)
 
 8º Observando el código
 
 He mirado el código de la web de login y nos damos cuenta que la carga de archivo está entrando haciendo una subida de directorio, por lo cual vamos a ver si podemos entrar haciendo un trasversal
 
-![](2022-06-22-10-31-50.png)
+![](assets/2022-06-22-10-31-50.png)
 
 entiendo que como tenemos el images.php realmente habría alguna forma en el que la url/image.php?algo=images/user-icon.png pero obviamente no sabemos que puede ser por lo que vamos a "fuzzearlo" para ver cual es el directorio superior.
 
@@ -116,12 +116,12 @@ Vamos a usar el diccionarios de SecList que tiene de burpsuiste y los parámetro
 wfuzz -u http://10.10.11.135/image.php?FUZZ=images/user-icon.png -w ../diccionarios/SecLists/Discovery/Web-Content/burp-parameter-names.txt -t200 --hh 0
 ```
 
-![](2022-06-22-10-42-15.png)
+![](assets/2022-06-22-10-42-15.png)
 
 Hemos encontrado img por lo que ahora buscaríamos con este parámetro img y vemos que funciona
 http://10.10.11.135/image.php?img=images/user-icon.png
 
-![](2022-06-22-10-44-12.png)
+![](assets/2022-06-22-10-44-12.png)
 
 
 Ya vemos que por este camino al menos nos devuelve algo por lo que parece que está ejecutando.
@@ -138,7 +138,7 @@ php://filter/convert.base64-encode/resource=/etc/passwd
 http://10.10.11.135/image.php?img=php://filter/convert.base64-encode/resource=/etc/passwd
 ```
 
-![](2022-06-22-11-05-40.png)
+![](assets/2022-06-22-11-05-40.png)
 
 ```bash
 
@@ -150,7 +150,7 @@ Ahora vamos a decodificar. Inicialmente lo metemos en un archivo pass.txt y lueg
 grep pass.txt | base64 -d
 
 ```
-![](2022-06-22-11-11-58.png)
+![](assets/2022-06-22-11-11-58.png)
 
 Realmente aquí solo está mostrando pero podemos por ejemplo encontrar información valiosa como puede ser que existe un suario que se llama aaron
 
@@ -169,40 +169,40 @@ El script sería algo así
 #!bin/bash
 curl -s "http://10.10.11.135/image.php?img=php://filter/convert.base64-encode/resource=$1" | base64 -d
 ```
-![](2022-06-22-11-26-57.png)
+![](assets/2022-06-22-11-26-57.png)
 
 Vamos a ver que hay en los archivos: para empezar en el db_conn podemos ver unas credenciales que añadimos a las credenciales e intentamos entrar en el login 
 
-![](2022-06-22-11-32-04.png)
+![](assets/2022-06-22-11-32-04.png)
 
 Vamos a intentar entrar con estas credenciales en el login y el ssh
 root 4_V3Ry_l0000n9_p422w0rd
 
 En la página no funciona, voy a probar el ssh tampoco
 
-![](2022-06-22-11-35-06.png)
+![](assets/2022-06-22-11-35-06.png)
 
 
 
 Por otro lado vemos el fileupload que es bastante interesante, podemos sacar directorios, restricciones etc
 
-![](2022-06-22-11-31-13.png)
+![](assets/2022-06-22-11-31-13.png)
 
 Probamos en el login con diferentes contraseñas antes de que cojamos y e intentemos algo más complicado. En este caso usamos el mismo login que encontramos antes aaron como password y vemos que funciona.
 
 Podemos ir a una zona que se llama profile_update.php , lo controlamos con el burpsuite y obtenemos la url que usa para actualizar. 
 
-![](2022-06-22-12-05-40.png)
+![](assets/2022-06-22-12-05-40.png)
 
 Ahora con el script que creamos antes vamos a bajar el codigo y verlo. Una vez descargado el archivo vemos que existe un parámetro que se llama role el cual no se envía pero podemos intentar ponerlo nosotros a ver que pasa...
 
-![](2022-06-22-12-17-45.png)
+![](assets/2022-06-22-12-17-45.png)
 
 si enviamos a repeater , añadimos el role=1 y enviamos, vemos que lo acepta, vamos luego a index y ahor atenemos una nueva página admin. Es necesario ser la misma sesion de burpsuite.
 
 Miramos la subida de un archivo normal. No se ejecuta pero si se puede ver desde el historial y enviar a repeater
 
-![](2022-06-22-12-26-45.png)
+![](assets/2022-06-22-12-26-45.png)
 
 Nos dice que no nos deja un png, miramos el código upload.php que vimos antes
 ```bash
@@ -215,9 +215,9 @@ Subimos un archivo con una shell y capturamos.
 
 Hay que tener en cuenta la forma de crear el nombre por lo que 
 
-![](2022-06-22-12-42-32.png)
+![](assets/2022-06-22-12-42-32.png)
 
-![](2022-06-22-12-51-24.png)
+![](assets/2022-06-22-12-51-24.png)
 
 Necesitamos pasar la hora y sabemos también según el código como va a estar formada la imagen por lo que abrimos una consola interactiva de php con php-a y ponemos básicamente los mismos datos
 
@@ -266,7 +266,7 @@ done
 ```
 Le damos permisos con chmod +x cmd.sh
 
-![](2022-06-22-18-29-37.png)
+![](assets/2022-06-22-18-29-37.png)
 
 Como vemos no nos deja movernos ni nada por lo que tendríamos que poner el comando
 
@@ -274,12 +274,12 @@ Como vemos no nos deja movernos ni nada por lo que tendríamos que poner el coma
 #poder mover los comandos, control c etc
 rlwrap ./cmd.sh
 ```
-![](2022-06-22-18-32-57.png)
+![](assets/2022-06-22-18-32-57.png)
 
 
 Vale ahora que ya estamos dentro con una pequeña consola vamos a ir listando cosas a ver si encontramos algo interesante
 
-![](2022-06-22-18-41-04.png)
+![](assets/2022-06-22-18-41-04.png)
 
 Hacemos varias entre ellas
 
@@ -304,7 +304,7 @@ total 616
 
 Hemos visto un soruces-filex-backup.zip para descargarlo como somo www-data lo que hacemos es pasarlo a /var/www/html/mybackup.zip y así para descargarlo solo tenemos que hacer http://10.10.11.135/mybackup.zip
 
-![](2022-06-22-18-50-11.png)
+![](assets/2022-06-22-18-50-11.png)
 
 No lo pasamos a nuestro directorio de trabajo y descomprimimos. Vemos que es un proyecto github y nuestra consola lo sabe.
 
@@ -353,7 +353,7 @@ aaron@timing:~$ cat user.txt
 
 ```
 
-![](2022-06-22-18-57-06.png)
+![](assets/2022-06-22-18-57-06.png)
 
 Por lo cual la primera parte la máquina completa ya somos usuarios propietarios de aaron, ahora necesitamos el system propietario.
 
@@ -432,13 +432,13 @@ Voy a intentar probar escuchando desde mi pc por el puerto 80 y a ver que nos di
 
 No vemos nada claro, voy a intentar montar el servidor desde python3, parece que si está haciendo la petición y parece que se descarga algo, vamos a intentar subir la imagen con el código cmd de antes porque como vimos nautils se ejecuta como root por lo que pienso que se guardará como root
 
-![](2022-06-22-19-14-56.png)
+![](assets/2022-06-22-19-14-56.png)
 
 > Importante : he intentado ver el jpg desde mi pc de mi servidor pero como el servidor lo habíá puesto en otra ruta pues obviamente no funcionaba y daba un 404. Lo que he hecho es desconectar el servidor, ir a la ruta donde está mi jpg y volver a lanzarlo. Así ya si funciona.
 
 Posteriormente he ido y he hecho una petición a mi ip/prueba.jpg y como vemos se ha descargado como root
 
-![](2022-06-22-19-19-33.png)
+![](assets/2022-06-22-19-19-33.png)
 
 Comprobamos que se ha subido el archivo y como vemos es propiedad de root
 
@@ -460,7 +460,7 @@ Primeramente aparte del enlace simbólico tendremos que crear nuestro clave púb
 ln -s -f /root/.ssh/authorized_keys id_rsa.pub
 ```
 
-![](2022-06-22-19-27-15.png)
+![](assets/2022-06-22-19-27-15.png)
 
 Ahora mismo nos sale en rojito porque está hecho como aaron, se supone que cuando subamos id_rsa.pub se sobreescribirá como root
 
@@ -504,15 +504,15 @@ credentials.txt  exploits     mybackup    prueba.jpg  Targeted
 ```
 Una vez lo tenemos vamos a usar el netutils y le pasamos ip/id_rsa.pub
 
-![](2022-06-22-19-37-44.png)
+![](assets/2022-06-22-19-37-44.png)
 
 Se ha descargado y si todo va bien debería usar root el enlace simbólico y ponerlo en authorized_keys, lo que pasa que como no podemos leer pues tendremos que hacer la prueba
 
-![](2022-06-22-19-39-56.png)
+![](assets/2022-06-22-19-39-56.png)
 
 Vamos a probar si podemos entrar como root y efectivamente funciona
 
-![](2022-06-22-19-41-06.png)
+![](assets/2022-06-22-19-41-06.png)
 
 y ya tenemos la nueva flag
 

@@ -1,6 +1,6 @@
 ## Máquina PLAYERTWO HTB
 
-![](2022-07-04-17-33-45.png)
+![](assets/2022-07-04-17-33-45.png)
 
 
 
@@ -84,7 +84,7 @@ nmap -sC -sV -p22,80,8545 10.10.10.170 -oN targeted
 >user: MrR3boot
 >domain: player2.htb
 
-![](2022-07-04-16-47-31.png)
+![](assets/2022-07-04-16-47-31.png)
 
 Se está ejecutando un ngix
 
@@ -119,7 +119,7 @@ En etc/hosts añadimos el subdominio
 ```
 Volvemos a hacer gobuster pero sale lo mismo, lo que si ahora podemos entrar en product.player2.htb cosa que antes no.
 
-![](2022-07-04-18-07-15.png)
+![](assets/2022-07-04-18-07-15.png)
 
 
 
@@ -302,7 +302,7 @@ Despues de estar má de una hora buscando he vuelto a hacer el curl y ohhh, dist
 
 {"name":"0xdf","pass":"tR@dQnwnZEk95*6#"}%  
 
-![](2022-07-04-19-40-24.png)
+![](assets/2022-07-04-19-40-24.png)
 
 Aparecen diferentes usuario y contraseña pero se vuelven a repetir por lo que parece que habrá un número limitado.
 
@@ -364,7 +364,7 @@ Mirándo el código veo que pone
 
 También es interesante que arrastramos unas cookies 
 
-![](2022-07-05-08-54-42.png)
+![](assets/2022-07-05-08-54-42.png)
 
 
 Es curioso que antes se me pasara que viendo el código de la página , y como no conocía el tema , no me diese cuenta que el nombre de la página es Protobs | Portal
@@ -376,16 +376,16 @@ Es curioso que antes se me pasara que viendo el código de la página , y como n
 
 Leyendo es hacktricks dice que que puede haber apis con versiones antiguas ... de manera totalmente random he probado /api/totp 
 
-![](2022-07-05-09-21-01.png)
+![](assets/2022-07-05-09-21-01.png)
 
 Me aparece que no acepta. get así que cambio a post
 
-![](2022-07-05-09-23-31.png)
+![](assets/2022-07-05-09-23-31.png)
 
 Vale me sale invalid action, voy a intentar mandarle algun tipo de json que ponga action y pondré también el application-Type json a ver.
-![](2022-07-05-09-48-19.png)
+![](assets/2022-07-05-09-48-19.png)
 
-![](2022-07-05-09-47-46.png)
+![](assets/2022-07-05-09-47-46.png)
 
 ```bash
 POST /totp HTTP/1.1
@@ -406,14 +406,14 @@ Connection: close
 otp=87685768223422&Submit=Submit
 ```
 
-![](2022-07-05-09-51-52.png)
+![](assets/2022-07-05-09-51-52.png)
 
 Ha costado pero por lo menos he conseguido entrar
 
-![](2022-07-05-09-56-08.png)
+![](assets/2022-07-05-09-56-08.png)
 
 He encontrado un tar que supuestamente vendrá el frimware... intentaré modificarlo porque luego en protobs nos deja subir un archivo con el firmware
 
 
-![](2022-07-05-09-59-08.png)
+![](assets/2022-07-05-09-59-08.png)
 

